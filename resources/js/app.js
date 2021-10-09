@@ -27,7 +27,14 @@ Vue.component('calendar', require('./components/Calendar').default);
  * the page. Then, you may begin adding components to this application
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
+import VueToast from 'vue-toast-notification'
+import 'vue-toast-notification/dist/theme-sugar.css'
+
+Vue.use(VueToast, {
+    position: 'top-right',
+    duration: 3500
+})
 
 const app = new Vue({
     el: '#app',
-});
+})

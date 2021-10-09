@@ -27,6 +27,7 @@
         "vue-template-compiler": "^2.6.12"
     },
     "dependencies": {
+        "vue-toast-notification": "0.6",
         "vue2-datepicker": "^3.10.2"
     }
 }

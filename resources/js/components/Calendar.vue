@@ -17,13 +17,17 @@
             <label class="block text-gray-700 text-sm font-bold mb-2">
               From
             </label>
-            <date-picker v-model="form.dateFrom" />
+            <date-picker v-model="form.dateFrom"
+                         value-type="format"
+                         format="YYYY-MM-DD"/>
           </div>
           <div>
             <label class="block text-gray-700 text-sm font-bold mb-2">
               To
             </label>
-            <date-picker v-model="form.dateTo"/>
+            <date-picker v-model="form.dateTo"
+                         value-type="format"
+                         format="YYYY-MM-DD"/>
           </div>
         </div>
       </div>
@@ -72,30 +76,25 @@
         </div>
       </div>
       <div class="mb-4">
-        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" @click="storeEvents"
+                :disabled="processing">
           Save
         </button>
       </div>
     </div>
     <div class="col-span-2 calendar-side">
       <div class="mb-4">
-        <h1 class="text-3xl font-bold">Jul 2021</h1>
+        <h1 class="text-3xl font-bold">{{ this.calendar.monthYear }}</h1>
       </div>
       <div class="table w-full">
-        <div class="py-4 border-b-2 border-t-2 border-gray-300 grid grid-cols-3 gap-2">
+        <div class="p-4 border-b-2 border-gray-300 grid grid-cols-3 gap-2"
+             :class="[index === 0 ? 'border-t-2' : '', calendar.event ? 'bg-green-100' : '']"
+             v-for="(calendar, index) in this.calendar.dates" :key="index">
           <div class="date">
-            1 Sun
+            {{ calendar.date }}
           </div>
           <div class="my-event col-span-2">
-            My Event
-          </div>
-        </div>
-        <div class="py-4 border-b-2 border-gray-300 grid grid-cols-3 gap-2 bg-green-100">
-          <div class="date">
-            1 Sun
-          </div>
-          <div class="my-event col-span-2">
-            My Event
+            {{ calendar.event }}
           </div>
         </div>
       </div>
@@ -125,7 +124,43 @@
           fri: null,
           sat: null,
           sun: null
-        }
+        },
+        calendar: {},
+        processing: false
+      }
+    },
+    beforeMount () {
+      this.fetchCalendar()
+    },
+    methods: {
+      fetchCalendar () {
+        axios.get('/api/calendar').then((response) => {
+          this.calendar = response.data
+        })
+      },
+      storeEvents () {
+        this.processing = true
+        axios.post('/api/calendar', this.cleanForm()).then(() => {
+          this.$toast.success('Event Succesfully Saved')
+          this.fetchCalendar()
+        }).catch(error => {
+          this.toastError(error)
+        })
+
+        this.processing = false
+      },
+      toastSuccess () {
+
+      },
+      toastError (error) {
+        Object.entries(error.response.data.errors).forEach(error => {
+          this.$toast.error(error[1][0])
+        })
+      },
+      cleanForm () {
+        return Object.fromEntries(
+          Object.entries(this.form).filter(([key, value]) => value != null && value !== false)
+        )
       }
     }
   }
