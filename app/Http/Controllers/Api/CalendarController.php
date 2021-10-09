@@ -14,10 +14,9 @@ class CalendarController extends Controller
     public function index()
     {
         $currentMonthYear = Carbon::now()->format('F Y');
-        $calendar = Calendar::query()->firstWhere('month_year', $currentMonthYear);
 
         return response()->json([
-            'dates' => $calendar->getCalendarEvents(),
+            'dates' => Calendar::getCalendar($currentMonthYear),
             'monthYear' => $currentMonthYear,
         ]);
     }
