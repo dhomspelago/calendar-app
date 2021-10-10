@@ -55,35 +55,6 @@ class Calendar extends Model
         }
     }
 
-    public function getCalendarEvents()
-    {
-        $startOfMonth = Carbon::now()->startOfMonth();
-        $endOfMonth = $startOfMonth->copy()->endOfMonth();
-        $dates = CarbonPeriod::create($startOfMonth, $endOfMonth)->toArray();
-
-        $calendarDates = [];
-        foreach ($dates as $date) {
-            $isPushed = false;
-            foreach ($this->events as $event) {
-                if ($event->date->equalTo($date)) {
-                    array_push($calendarDates, [
-                        'date' => $date->format('d D'),
-                        'event' => $event->name,
-                    ]);
-
-                    $isPushed = true;
-                }
-            }
-            if (! $isPushed) {
-                array_push($calendarDates, [
-                    'date' => $date->format('d D'),
-                ]);
-            }
-        }
-
-        return $calendarDates;
-    }
-
     public static function getCalendar($currentMonthYear)
     {
         $calendar = Calendar::query()->firstWhere('month_year', $currentMonthYear);
